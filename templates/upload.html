@@ -1,47 +1,167 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Upload & View Data</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload MLers Data</title>
     <style>
+        /* Reset & global styles */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f7f9fc;
+            color: #333;
             margin: 0;
             padding: 20px;
         }
-        h1 {
-            color: #333;
-        }
-        form {
-            background-color: #fff;
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: #fff;
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        /* Form styling */
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
         input[type="file"] {
-            margin-bottom: 10px;
+            flex: 1 1 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #f7f7f7;
+            cursor: pointer;
         }
-        input[type="submit"] {
-            background-color: #28a745;
+
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            transition: background 0.3s ease;
+            font-weight: bold;
         }
-        input[type="submit"]:hover {
-            background-color: #218838;
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            min-width: 100px;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f4f6f8;
+        }
+
+        tr:hover {
+            background-color: #e1f0ff;
+        }
+
+        td a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        td a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            input[type="file"], button {
+                flex: 1 1 100%;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px 6px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Upload MLers Data</h1>
+
+<div class="container">
+    <h2>Upload & View Data</h2>
+
     <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".txt" required><br>
-        <input type="submit" value="Upload">
+        <input type="file" name="file" required>
+        <button type="submit">Upload</button>
     </form>
+
+    {% if rows %}
+    <h3>Uploaded Data</h3>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>GitHub</th>
+            <th>LinkedIn</th>
+            <th>Kaggle</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row.Name }}</td>
+            <td>
+                {% if row.GitHub %}
+                <a href="{{ row.GitHub }}" target="_blank">{{ row.GitHub }}</a>
+                {% endif %}
+            </td>
+            <td>
+                {% if row.LinkedIn %}
+                <a href="{{ row.LinkedIn }}" target="_blank">{{ row.LinkedIn }}</a>
+                {% endif %}
+            </td>
+            <td>
+                {% if row.Kaggle %}
+                <a href="{{ row.Kaggle }}" target="_blank">{{ row.Kaggle }}</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+
 </body>
 </html>
