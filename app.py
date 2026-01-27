@@ -10,12 +10,11 @@ def upload_data():
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
-
         if uploaded_file and uploaded_file.filename != '':
-            # Read file content directly from memory
+            # Read file directly from memory
             data = uploaded_file.read().decode('utf-8')
-            sections = data.strip().split("-------------")
 
+            sections = data.strip().split("-------------")
             for section in sections:
                 lines = [l.strip() for l in section.strip().split("\n") if l.strip()]
                 if not lines:
@@ -27,16 +26,15 @@ def upload_data():
                     "Kaggle": lines[3] if len(lines) > 3 else ""
                 })
 
-            # Create Excel file in memory
+            # Create Excel in memory
             df = pd.DataFrame(rows)
             output = BytesIO()
             df.to_excel(output, index=False)
             output.seek(0)
 
-            # Optional: return Excel for download
+            # Return Excel for download
             return send_file(output, download_name="mler_details.xlsx", as_attachment=True)
 
-    # For GET requests or no file uploaded
     return render_template('upload.html', rows=rows)
 
 if __name__ == '__main__':
