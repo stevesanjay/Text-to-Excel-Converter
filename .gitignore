@@ -144,3 +144,5 @@ venv/
 venv3
 
 *.xlsx
+.vercel
+.env*.local

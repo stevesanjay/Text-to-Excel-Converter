@@ -1,35 +1,25 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 import pandas as pd
-import os
+from io import BytesIO
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-
 @app.route('/', methods=['GET', 'POST'])
 def upload_data():
-    rows = []  # list to store data for display
+    rows = []
 
     if request.method == 'POST':
         uploaded_file = request.files['file']
 
         if uploaded_file and uploaded_file.filename != '':
-            text_file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.filename)
-            uploaded_file.save(text_file_path)
-
-            with open(text_file_path, 'r') as f:
-                data = f.read()
-
+            # Read file content directly from memory
+            data = uploaded_file.read().decode('utf-8')
             sections = data.strip().split("-------------")
 
             for section in sections:
                 lines = [l.strip() for l in section.strip().split("\n") if l.strip()]
                 if not lines:
                     continue
-
                 rows.append({
                     "Name": lines[0],
                     "GitHub": lines[1] if len(lines) > 1 else "",
@@ -37,16 +27,17 @@ def upload_data():
                     "Kaggle": lines[3] if len(lines) > 3 else ""
                 })
 
-            # Save Excel file
+            # Create Excel file in memory
             df = pd.DataFrame(rows)
-            df.to_excel("mler_details.xlsx", index=False)
+            output = BytesIO()
+            df.to_excel(output, index=False)
+            output.seek(0)
 
-            # ✅ Render template with rows instead of returning string
-            return render_template('upload.html', rows=rows)
+            # Optional: return Excel for download
+            return send_file(output, download_name="mler_details.xlsx", as_attachment=True)
 
-    # For GET requests
+    # For GET requests or no file uploaded
     return render_template('upload.html', rows=rows)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
